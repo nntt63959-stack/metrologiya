@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metrologiya Asoslari — Test</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #4f6ef7;
+    --accent2: #6c8afb;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #facc15;
+    --text: #e8eaf6;
+    --muted: #7b83ab;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ===== LOGIN ===== */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 60% 30%, #1a1f3d 0%, #0f1117 70%);
+  }
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 360px;
+    box-shadow: 0 24px 80px rgba(79,110,247,0.12);
+    text-align: center;
+  }
+  .login-logo {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+  .login-box h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .login-box p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+  .input-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .input-wrap input {
+    width: 100%;
+    padding: 14px 48px 14px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .input-wrap input:focus { border-color: var(--accent); }
+  .input-wrap .eye-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 16px;
+    padding: 4px;
+  }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+  .login-btn:hover { opacity: .9; }
+  .login-btn:active { transform: scale(.98); }
+  .error-msg {
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ===== MAIN APP ===== */
+  #app { display: block; }
+
+  /* ===== SETUP ===== */
+  #setup-screen {
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .setup-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 440px;
+    box-shadow: 0 24px 80px rgba(79,110,247,0.1);
+  }
+  .setup-box h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .setup-box .sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .field-group {
+    margin-bottom: 20px;
+  }
+  .field-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .field-group input[type=number], .field-group select {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+  }
+  .field-group input[type=number]:focus, .field-group select:focus {
+    border-color: var(--accent);
+  }
+  .start-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity .2s;
+  }
+  .start-btn:hover { opacity: .9; }
+  .info-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .info-chip {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .info-chip .num { font-size: 22px; font-weight: 700; color: var(--accent2); }
+  .info-chip .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ===== QUIZ ===== */
+  #quiz-screen { display: none; padding: 24px; }
+  .quiz-header {
+    max-width: 760px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .progress-wrap { flex: 1; }
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+  .timer-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    min-width: 72px;
+    text-align: center;
+  }
+  .timer-badge.urgent { color: var(--red); border-color: var(--red); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+  .question-card {
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+  }
+  .q-number {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 14px;
+  }
+  .q-text {
+    font-size: 17px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .options-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-btn {
+    width: 100%;
+    text-align: left;
+    padding: 16px 20px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    line-height: 1.5;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(79,110,247,.08);
+  }
+  .option-btn .opt-letter {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .option-btn.correct {
+    border-color: var(--green);
+    background: rgba(34,197,94,.1);
+  }
+  .option-btn.correct .opt-letter { background: var(--green); color: #fff; }
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: rgba(239,68,68,.1);
+  }
+  .option-btn.wrong .opt-letter { background: var(--red); color: #fff; }
+  .option-btn:disabled { cursor: default; }
+
+  .nav-row {
+    max-width: 760px;
+    margin: 20px auto 0;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .next-btn {
+    padding: 12px 32px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
+    transition: opacity .2s;
+  }
+  .next-btn:hover { opacity: .85; }
+
+  /* ===== RESULTS ===== */
+  #result-screen {
+    display: none;
+    min-height: 100vh;
+    padding: 40px 24px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .result-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .result-top {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .big-score {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .score-label {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    flex: 1;
+    min-width: 120px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .val { font-size: 26px; font-weight: 700; }
+  .stat-card .val.g { color: var(--green); }
+  .stat-card .val.r { color: var(--red); }
+  .stat-card .val.y { color: var(--yellow); }
+  .stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .review-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-size: 12px;
+  }
+  .review-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 10px;
+  }
+  .review-item .ri-q {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .review-item .ri-ans {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 7px;
+    display: inline-block;
+  }
+  .review-item .ri-ans.correct { background: rgba(34,197,94,.15); color: var(--green); }
+  .review-item .ri-ans.wrong { background: rgba(239,68,68,.12); color: var(--red); }
+  .review-item .ri-correct { font-size: 12px; color: var(--green); margin-top: 6px; }
+  .restart-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 24px;
+  }
+  @media (max-width: 480px) {
+    .setup-box { width: 100%; padding: 28px 20px; border-radius: 16px; }
+    .login-box { width: 100%; padding: 32px 20px; border-radius: 16px; }
+    .question-card { padding: 20px 16px; border-radius: 16px; }
+    .q-text { font-size: 15px; }
+    .option-btn { font-size: 14px; padding: 13px 14px; }
+    .result-box { padding: 24px 16px; }
+    .big-score { font-size: 54px; }
+    .info-row { gap: 8px; }
+    #quiz-screen { padding: 12px; }
+    #result-screen { padding: 20px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="login-screen" style="display:none;display:none;">
+  <div class="login-box">
+    <div class="login-logo">📐</div>
+    <h1>Metrologiya Asoslari</h1>
+    <p>Testga kirish uchun parolni kiriting</p>
+    <div class="input-wrap">
+      <input type="password" id="pass-input" placeholder="Parol" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="eye-btn" onclick="togglePass()">👁</button>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Kirish →</button>
+    <p class="error-msg" id="err-msg">❌ Parol noto'g'ri!</p>
+  </div>
+</div>
+
+<!-- ========== APP ========== -->
+<div id="app">
+
+  <!-- SETUP -->
+  <div id="setup-screen" style="display:flex;">
+    <div class="setup-box">
+      <h2>⚙️ Test sozlamalari</h2>
+      <p class="sub">Metrologiya Asoslari — 2025-26 o'quv yili</p>
+
+      <div class="info-row">
+        <div class="info-chip">
+          <div class="num" id="total-q-count">241</div>
+          <div class="lbl">Jami savol</div>
+        </div>
+        <div class="info-chip">
+          <div class="num">A</div>
+          <div class="lbl">To'g'ri javob</div>
+        </div>
+        <div class="info-chip">
+          <div class="num">4</div>
+          <div class="lbl">Variant / savol</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Nechta savol ishlash?</label>
+        <input type="number" id="count-input" min="5" max="241" value="30" placeholder="5 dan 241 gacha">
+      </div>
+      <div class="field-group">
+        <label>Har bir savolga vaqt (soniya)</label>
+        <input type="number" id="time-input" min="10" max="300" value="60" placeholder="10-300 soniya">
+      </div>
+      <div class="field-group">
+        <label>Savollar tartibi</label>
+        <select id="order-input">
+          <option value="random">Tasodifiy tartibda</option>
+          <option value="seq">Ketma-ket</option>
+        </select>
+      </div>
+      <button class="start-btn" onclick="startQuiz()">Testni boshlash 🚀</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen">
+    <div class="quiz-header">
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span id="prog-text">1 / 30</span>
+          <span id="score-live">✅ 0 &nbsp; ❌ 0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="timer-badge" id="timer-badge">60</div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-number" id="q-number">Savol 1</div>
+      <div class="q-text" id="q-text"></div>
+      <ul class="options-list" id="options-list"></ul>
+    </div>
+
+    <div class="nav-row">
+      <button class="next-btn" id="next-btn" onclick="nextQuestion()">Keyingi ▶</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="result-screen">
+    <div class="result-box">
+      <div class="result-top">
+        <div class="big-score" id="big-score">0%</div>
+        <div class="score-label" id="score-label">Natijangiz</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="val g" id="r-correct">0</div><div class="lbl">To'g'ri</div></div>
+        <div class="stat-card"><div class="val r" id="r-wrong">0</div><div class="lbl">Noto'g'ri</div></div>
+        <div class="stat-card"><div class="val y" id="r-skipped">0</div><div class="lbl">O'tkazildi</div></div>
+        <div class="stat-card"><div class="val" id="r-total">0</div><div class="lbl">Jami</div></div>
+      </div>
+      <div class="review-title">📋 Noto'g'ri javoblar sharhi</div>
+      <div id="review-list"></div>
+      <button class="restart-btn" onclick="goSetup()">🔄 Qayta boshlash</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===================== INIT =====================
+window.onload = function() {
+  document.getElementById('setup-screen').style.display = 'flex';
+};
+
+// ===================== PASSWORD =====================
+const PASSWORD = "metrologiya2025";
+
+function togglePass() {
+  const i = document.getElementById('pass-input');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+function doLogin() {
+  const val = document.getElementById('pass-input').value;
+  if (val === PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('setup-screen').style.display = 'flex';
+  } else {
+    document.getElementById('err-msg').style.display = 'block';
+    document.getElementById('pass-input').value = '';
+    setTimeout(() => document.getElementById('err-msg').style.display = 'none', 2000);
+  }
+}
+
+// ===================== DATA =====================
+const QUESTIONS = [
+  {"q":"Metrologiya nima ?","options":["Talab etilgan aniqlikga erishish haqidagi fan.","Standartlashtirish soxasidagi munosabatlarni tartibga solish;","Metrologiya soxasidagi munosabatlarni tartibga solish;","Umumiy va ko'p marta foydalanish uchun qoidalarni belgilaydigan faoliyat."]},
+  {"q":"O'lchov vositalari o'lchash jarayonidagi bajarayotgan funksiyasiga qarab qanday o'lchov asboblariga bo'linadi?","options":["Ishchi, namunaviy, etalon.","ampermetr, voltmetr, ommetr.","o'lchov, standart, namuna.","absolyut, nisbiy, keltirilgan"]},
+  {"q":"Xalq ho'jaligining barcha tarmoqlarida amaliy o'lchashlar uchun mo'ljallangan o'lchov asboblari .........","options":["Ishchi o'lchov asboblari deb ataladi.","-namunaviy o'lchov asboblari deb ataladi.","etalon o'lchov asboblari deb ataladi.","texnik o'lchov asboblari deb ataladi."]},
+  {"q":"O'lchov asboblarining aniqlik klassi nechta qismga bo'linadi?","options":["8 ta q'ismdan iborat","2 ta qismdan iborat","4 ta q'ismdan iborat","6 ta q'ismdan iborat"]},
+  {"q":"Metrologiya asoslari moduli nechta bo'limga ajratiladi?","options":["3 ta bo'limdan iborat","2 ta bo'limdan iborat","5 ta bo'limdan iborat","4 ta bo'limdan iborat"]},
+  {"q":"Moddalar xajmi o'zgarmas bo'lganda temperatura o'zgarishi bilan bosimning o'zgarishiga asoslangan termometrlar ........","options":["Manometrik termometrlar","kengayish termometrlari","q'arshilik termometrlari","termoelektr termometrlari"]},
+  {"q":"Amaliy metrologiya nima bilan shug'ullanadi?","options":["Amaliy metrologiya nazariy tadqiqotlar natijalari va Qonunchilik metrologiyasi qoidalarini amaliyotga tatbiq yetish bilan shug'ullanadi.","Qonunchilik metrologiyasi qoidalarini amaliyotga tatbiq yetish bilan shug'ullanadi.","Amaliy metrologiya nazariy tadqiqotlari natijalarini amaliёtga tatbiq etish bilan shug'ullanadi.","Metrologiyasi qoidalarini amaliёtga tatbiq etish bilan shug'ullanadi."]},
+  {"q":"Nurlanish termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["- 50°C dan  6000°C gacha","-200°C dan 600°C gacha","-0°C dan  500°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Qanday xatolik metrologik tavsifda meyorlangan bo'ladi?","options":["Keltirilgan xatolik","nisbiy xatolik","instrumental xatolik","muntazam xatolik"]},
+  {"q":"O'lchov asbobining qanday xatoligi o'lchash chegarasiga bog'liq ravishda o'sadi?","options":["Absolyut xatolik","additiv xatolik","multiplikativ xatolik","instrumental xatolik"]},
+  {"q":"Suyuqlikning ma'lum bir doimiy xajmining vaznini uzluksiz tortib turishga asoslangan zichlik o'lchagich nomini aniqlang?","options":["Vaznli zichlik o'lchagich","Kalkovichli zichlik o'lchagich","Gidrositatik zichliq' o'lchagich","Radioizotopik zichlik o'lchagich"]},
+  {"q":"Kengayish termometrlarining suyuqligi sifatida qanday ximiyaviy moddalar ishlatiladi?","options":["Kerosin, toluol, etanol","Suv, yog', azot","Kislorod, ftor, xlor","Geliy, neon, argon"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning elektr o'tkazuvchanligiga ko'ra o'lchash .........","options":["Konduktometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Optik usul deb ataladi","Avtomatik usul deb ataladi,"]},
+  {"q":"Qayta ko'rib chiqilgan Halqaro birliklar (HB) sistemasi qachondan kuchga kirgan.","options":["2019 yil 20 maydan kuchga kirgan","2020 yil 20 maydan kuchga kirgan","2018 yil 20 maydan kuchga kirgan","2019 yil 20 martdan kuchga kirgan"]},
+  {"q":"O'zgarmas tok zanjirida qarshilikning qiymati 10 om,  tok kuchining qiymati 5A  bo'lganda kuchlanishning qiymatini aniqlang?","options":["50 V","5 V","15 V","2 V"]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish ikki marta oshganda ajralib chiqqan quvvat qanday o'zgaradi?","options":["4 marta oshadi","2 marta oshadi","2 marta kamayadi","4 marta kamayadi"]},
+  {"q":"Kappilyar viskozimetri bo'yicha aniqlanishi mumkin bo'lgan qovushqoqlikning chegarasini aniqlab bering?","options":["0,001 dan 10 Pa*s gacha","0,01 dan 100 Pa *s gacha","0,01 dan 1000 Pa*s gacha","0,001 dan 0,1 Pa*s gacha"]},
+  {"q":"Galvanometrning aniqlik klassi 0,05 ga teng. Galvanometrning to'g'ri ishlash chegarasidagi maksimal keltirilgan xatolik qiymatini aniqlang.","options":["0,05 %","1,5 %","1,0 %","2,5 %"]},
+  {"q":"Halqaro birliklar sistemasi bo'yicha metr o'lchov birligi qaysi asosda qabul qilingan?","options":["Yer meridianining qirq milliondan  bir ulushi bo'yicha  qabul qilingan.","Yorug'lik tezkigi asosida qabul qilingan.","Ekvatorning uzunligi bo'yicha  qabul qilingan.","Yer diametrining uzunligi asosida qabul qilingan."]},
+  {"q":"Yurak biopotensialini o'lchash uchun mo'ljallangan o'lchash asboblari .......","options":["Elektrokardiograflar deb ataladi.","elektroensefalograflar deb ataladi.","elektropotensiallar deb ataladi.","magnitoensefalograflar deb ataladi."]},
+  {"q":"Modda miqdorini o'lchaydigan asboblar ...:","options":["Sarf o'lchagichlar deb ataladi","Hisoblagichlar deb ataladi","Vazn o'lchagichlar deb ataladi","Bosim o'lchagichlar deb ataladi"]},
+  {"q":"Galvonometrning ko'rsatishi 100 mA va o'lchanayotgan tok kuchining haqiqiy qiymati 98 mA bo'lganda, galvanometrning nisbiy xatoligini aniq'lang?","options":["2,04%","1,5%","2,0%","2,1%"]},
+  {"q":"Absolyut xatolikni o'lchov asbobining chegaraviy qiymatyga nisbati bilan aniqlanadigan xatolik ...:","options":["Keltirilgan xatolik deb ataladi","absolyut xatolik deb ataladi.","nisbiy xatolik deb ataladi.","Instrumental xatolik deb ataladi"]},
+  {"q":"O'rta Osiyoda 'O'lchovlar va tarozilar to'g'risida Nizom' Turkiston Respublikasi SNK tomonidan nechanchi yilda tasdiqlangan","options":["1923 yil 18 aprelda tasdiqlangan","1921 yil 18 martda tasdiqlangan","1925 yil 18 aprelda tasdiqlangan","1924 yil 18 martda tasdiqlangan"]},
+  {"q":"O'lchash chegarasi 25 A ga teng bo'lgan ampermetrning ko'rsatishi 20 A va o'lchanayotgan tok kuchining xaqiqiy qiymati 19 A ga teng. Ampermetrning keltirilgan xatoligini aniqlang?","options":["4,0%","2,0%","3,0%","6,0%"]},
+  {"q":"Metr o'lchov birligining zamonaviy aniqlash usuli ……….. .","options":["1/299 792 458 soniyaning bir qismida vakuumda yorug'lik nurlari o'tadigan yo'l uzunligi hisoblanadi.","1/60 soniyaning bir qismida vakuumda yorug'lik nurlari o'tadigan yo'l uzunligi bo'yicha  qabul qilingan.","1/60 soniyaning bir qismida vakuumda ёrug'lik nurlari o'tadigan yo'l uzunligi bo'yicha  qabul qilingan.","1/60 soatning bir qismida vakuumda ёrug'lik nurlari o'tadigan yo'l uzunligi bo'yicha  qabul qilingan."]},
+  {"q":"Bosim o'lchash asboblarini ko'rsatib bering?","options":["Manometr, barometr, vakuummetr","Ampermetr, voltmetr, ommetr","Termometr, logometr","potentsiometr, konduktometr"]},
+  {"q":"Halqaro birliklar sistemasi bo'yicha kilogramm o'lchov birligi qaysi asosda qabul qilingan?","options":["Bir kub desimetr suvning temperaturasi 4oC bo'lgandagi massasi - bo'yicha  qabul qilingan.","Bir kub metr suvning temperaturasi 4oC bo'lgandagi massasi - bo'yicha  qabul qilingan.","Normal atmosfera bosimidagi 1 litr suvning massasi - bo'yicha  qabul qilingan.","Bir kub desimetr suvning temperaturasi 14oC bo'lgandagi massasi - bo'yicha  qabul qilingan."]},
+  {"q":"Vattmetrning ko'rsatishi Wn= 50 vt va o'lchanayotgan quvvatning haqiqiy qiymati Wnx = 49 vt bo'lganda vattmetrning nisbiy xatoligini aniklang?","options":["2,04  %","1,5  %","2,1  %","2,5  %"]},
+  {"q":"O'zbekiston Texnik jihatdan tartibga solish agentligi Hay'ati tarkibi O'zbekiston Respublikasi Vazirlar Mahkamasi tomonidan qachon tasdiqlangan:","options":["2025-yil 11-yanvardagi 11-son qarori bilan tasdiqlangan.","2023-yil 22-yanvardagi 11-son qarori bilan tasdiqlangan.","2026-yil 10-yanvardagi 11-son qarori bilan tasdiqlangan.","2026-yil 15-yanvardagi 10-son qarori bilan tasdiqlangan."]},
+  {"q":"O'zbekiston Texnik jihatdan tartibga solish agentligining Apellyatsiya kengashi tarkibi tomonidan qachon tasdiqlangan?","options":["2022-yil 2-noyabrdagi 59-son buyrug'i bilan tasdiqlangan.","2021-yil 2-noyabrdagi 59-son buyrug'i bilan tasdiqlangan.","2023-yil 2-noyabrdagi 59-son buyrug'i bilan tasdiqlangan.","2025-yil 2-noyabrdagi 59-son buyrug'i bilan tasdiqlangan."]},
+  {"q":"Apellyatsiya kengashi tarkibi kim tomonidan tasdiqlangan?","options":["O'zbekiston Texnik jihatdan tartibga solish agentligi Bosh direktori tomonidan  tasdiqlangan.","O'zbekiston Respublikasi Vazirlar Mahkamasi tomonidan  tasdiqlangan.","O'zbekiston Milliy Metrologiya instituti tomonidan  tasdiqlangan.","O'zbekiston Respublikasi standartlashtirish instituti tomonidan  tasdiqlangan."]},
+  {"q":"O'lchash chegarasi 50 V ga teng bo'lgan voltmetrning ko'rsatishi 40 V  va o'lchanayotgan kuchlanishning  haqiqiy qiymati 38 V ga teng. Voltmetrning  keltirilgan  xatoligyni aniklang:","options":["4,0%","2,0%","6,0%","8,0%"]},
+  {"q":"Bosh miyadagi elektrik potensiallarni o'lchashga asoslangan usul .......","options":["elektroensefalografiya usuli deb ataladi.","elektrokardiografiya usuli deb ataladi.","elektrobiopotensialografiya usuli deb ataladi.","magnitoensefalografiya usuli deb ataladi."]},
+  {"q":"Fizik kattalik birliklarini qayta tiklash va ularni saqlash uchun xizmat qiladigan o'lchov asboblari...:","options":["Etalon o'lchov asboblari deb ataladi.","ishchi o'lchov asboblari deb ataladi.","namunaviy o'lchov asboblari deb ataladi.","texnik o'lchov asboblari deb ataladi."]},
+  {"q":"Qaysi termometrlar monometrik termometrlar guruhiga kiradi:","options":["Gazli, suyuqlikli, bug'-suyuqlikli termometrlar.","Shisha termometrlar, dilatometrik va bimetallik termometrlar.","Metall o'tkazgichli termometrlar, yarim o'tkazgichli termometrlar.","Kvazimonoxromatik termometrlar, spektral nisbatli pirometrlar, to'liq' nurlanish pirometrlar."]},
+  {"q":"Suyuq'likli termometrlar qaysi diapazondagi haroratni o'lchash uchun mo'ljallangan?","options":["- 2000C dan  6000C gacha","00C dan   5000C gacha","00C dan  10000C gacha","100C dan  3000C gacha."]},
+  {"q":"Suyuqlik yoki qattiq jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar:","options":["Kengayish termometrlari","Monometrik termometrlari","Termoelektr termometrlari","Qarshilik termometrlari"]},
+  {"q":"Elektr qarshilikning o'zgarishiga asoslangan termometlar:","options":["Qarshilik termometlari","Nurlanish termometlari","Termoelektr termometlari","Kengayish termometrlari"]},
+  {"q":"Monometrik termometrlar qaysi diapozondagi temperaturani o'lchash uchun mo'ljallangan:","options":["- 50 C dan   1000 C gacha","- 200 C dan  600 C gacha","- 0 C dan  500 C gacha","- 260 C dan   1100 C gacha"]},
+  {"q":"O'lchov vositalari asosan  qanday o'lchov asboblariga bo'linadi:","options":["Ishchi, namunaviy, etalon.","ampermetr, voltmetr, ommetr.","o'lchov, standart, namuna.","absolyut, nisbiy, keltirilgan"]},
+  {"q":"Xalq' xo'jaligining barcha tarmoqlarida amaliy o'lchashlar uchun mo'ljallangan o'lchov asboblari..........","options":["Ishchi o'lchov asboblari deb ataladi.","namunaviy o'lchov asboblari deb ataladi.","etalon o'lchov asboblari deb ataladi.","texnik o'lchov asboblari deb ataladi"]},
+  {"q":"Yurak biopotensialini o'lchashga asoslangan usul .......","options":["elektrokardiografiya usuli deb ataladi.","elektroensefalografiya usuli deb ataladi.","elektrobiopotensialografiya usuli deb ataladi.","magnitoensefalografiya usuli deb ataladi."]},
+  {"q":"O'lchov asboblarining aniq'lik klassi nechta qismga bo'linadi:","options":["8 ta qismdan iborat","2 ta qismdan iborat","4 ta qismdan iborat","6 ta qismdan iborat"]},
+  {"q":"O'zbekiston Respublikasida standartlarning qanday toifalari amal qiladi.","options":["миллий стандартлар; халқаро (минтақавий) стандартлар; хорижий мамлакатларнинг стандартлари.","миллий стандартлар; халқаро (минтақавий) стандартлар; хuquqiy стандартлар.","Texnik стандартлар; халқаро (минтақавий) стандартлар; хорижий мамлакатларнинг стандартлари.","миллий стандартлар; umumiy стандартлар; Texnik стандартлар."]},
+  {"q":"O'zbekiston Respublikasida o'lchashlarning yagona birlikda bo'lishini ta'minlashga doir qanday normativ hujjatlar qo'llaniladi?","options":["o'lchash vositalarini qiyoslash uslubiyoti; o'lchash vositalarini kalibrlash uslubiyoti; o'lchashlarni bajarish uslubiyoti; sinov vositalarini attestatsiyadan o'tkazish uslubiyoti.","o'lchashlarni bajarish uslubiyoti; sinov vositalarini attestatsiyadan o'tkazish uslubiyoti.","o'lchash vositalarini qiyoslash uslubiyoti; o'lchash vositalarini kalibrlash uslubiyoti;","o'lchash vositalarini qiyoslash uslubiyoti; sinov vositalarini attestatsiyadan o'tkazish uslubiyoti."]},
+  {"q":"Moddalar hajmi o'zgarmas bo'lganda temperatura o'zgarishi bilan bosimning o'zgarishiga asoslangan termometrlar:","options":["manometrik termometrlar","kengayish termometrlari","qarshilik termometrlari","termoelektr termometrlari"]},
+  {"q":"Nurlanish termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (2):","options":["-50°C dan    6000°C gacha","-200°C dan     600°C gacha","-0°C dan    500°C gacha","10°C dan   300°C gacha"]},
+  {"q":"Kengayish termometrlarining suyuqligi sifatida qanday ximiyaviy moddalar   ishlatiladi:","options":["Kerosin, toluol, etanol","Suv, yog, azot","Kislorod, ftor, xlor","Geliy, neon, argon"]},
+  {"q":"Elektrolit eritmalarining konsentratsiyasini ularning elektr o'tkazuvchanligiga ko'ra o'lchash","options":["Konduktometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Optik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  pH  ko'rsatkichiga  ko'ra o'lchash ...:","options":["Potentsiometrik usul deb ataladi,","Optik usul deb ataladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  nur o'tkazish koeffitsientiga   ko'ra o'lchash ...:","options":["Spektrofotometrik usul deb ataladi,","Potentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Bosh miyadagi magnit maydoni ta'siridagi o'zgarishlarni o'lchashga asoslangan usul .......","options":["magnitoensefalografiya usuli deb ataladi.","elektroensefalografiya usuli deb ataladi.","elektrokardiografiya usuli deb ataladi.","elektrobiopotensialografiya usuli deb ataladi."]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  qutblanish tekisligini burilish burchagini o'lchashga asoslangan usul ...:","options":["polyarimetrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  nurning sochilishiga    ko'ra o'lchash ..","options":["Nefelometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektr o'lchash  asboblari o'zining tuzilishi va ishlash prinsipi jihatidan qanday o'lchash asboblariga bo'linadi:","options":["Magnitoelektrik o'lchash  asboblari; Elektromagnitik o'lchash  asboblari; Elektrodinamik o'lchash  asboblari.","Elektromagnitik o'lchash  asboblari; Elektrodinamik o'lchash  asboblari.","Magnitoelektrik o'lchash  asboblari; Elektrodinamik o'lchash  asboblari.","Magnitoelektrik o'lchash  asboblari; Elektromagnitik o'lchash  asboblari;"]},
+  {"q":"O'zgarmas tok zanjirida kuchlanish qiymati 10 V tok kuchining qiymati 5 A, qarshilikning qiymatini aniqlang:","options":["2  Om","5 Om","10 Om","15om"]},
+  {"q":"Nurlanish termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (3):","options":["- 50°S dan +6000°S gacha","-200°S dan +600°S gacha","0°S dan +500°S gacha","0°S dan +1100°S gacha"]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish ikki marta oshganda ajralib chiqqan quvvat qanday o'zgaradi (2):","options":["4 marta oshadi","2 marta oshadi","2 marta kamayadi","4 marta kamayadi"]},
+  {"q":"Kappilyar viskozimetri bo'yicha aniqlanishi mumkin bo'lgan qovushqoqlikning chegarasini aniqlab bering (2):","options":["0,001 dan 10 Pa s gacha","0,01 dan 100 Pa s gacha","0,01 dan 1000 Pas gacha","0,001 dan 0,1 Pas gacha"]},
+  {"q":"Ishlab turgan bosh miyani virtual rasmlari yordamida uning aktivligini qayd qilishga asoslangan usul ......... .","options":["tomografik usul deb ataladi.","poligrafik usul deb ataladi.","pozitron-emission tamografik usul deb ataladi.","magnit-rezonans tamografik usul deb ataladi."]},
+  {"q":"Galvanometrning aniqlik klassi 0,01 ga teng. Galvanometrning to'g'ri ishlash chegarasidagi maksimal keltirilgan xatolik qiymatini aniqlang (2):","options":["0,01 %","0,02 %","0,05 %","0,1 %"]},
+  {"q":"Atmosfera bosimini o'lchaydigan o'lchov asbobi .... :","options":["Barometr deb ataladi","Manometr deb ataladi","Vakuummetr deb ataladi","Monovakuummetr deb ataladi"]},
+  {"q":"Modda miqdorini o'lchaydigan asboblar ....:","options":["Hisoblagichlar deb ataladi","Sarf o'lchagichlar deb ataladi","Vazn o'lchagichlar deb ataladi","Bosim o'lchagichlar deb ataladi"]},
+  {"q":"O'lchash chegarasi 25A ga teng bo'lgan ampermetrning ko'rsatishi 20 A va o'lchanayotgan tok kuchining xaqiqiy qiymati 19 A ga teng. Ampermetrning keltirilgan xatoligini aniqlang (2):","options":["4,0%","1,0%","2,0%","3,0%"]},
+  {"q":"Bosim o'lchash asboblarini ko'rsatib bering (2):","options":["Manometr, barometr, vakuummetr","Ampermetr, voltmetr, ommetr","Termometr, logometr","potensiometr, konduktometr"]},
+  {"q":"Absolyut xatolikni kattalikning o'lchangan qiymatiga nisbati bilan aniqlanadigan xatolik…:","options":["Nisbiy xatolik deb ataladi","Absolyut xatolik deb ataladi","Keltirilgan xatolik deb ataladi","Instrumental xatolik deb ataladi"]},
+  {"q":"Vattmetrning ko'rsatishi Wn = 200 vt va o'lchanayotgan quvvatning xaqiqiy qiymati Wnx = 196 vt bo'lganda vattmetrning nisbiy xatoligini aniqlang:","options":["2,04%","2,1%","2,5%","1,0"]},
+  {"q":"O'lchash chegarasi 50 V ga teng bo'lgan voltmetrning ko'rsatishi 40 V  va o'lchanayotgan kuchlanishning xaqiqiy 38 V ga teng voltmetrning keltirilgan xatoligyni aniqlang.","options":["4,0%","2,0%","1,0%","3,0%"]},
+  {"q":"Odam organizmidagi hosil bo'ladigan har xil fizoilogik jarayonlarni magnit maydoni ta'siridagi o'zgarishlarni o'lchashga asoslangan usul .......  .","options":["magnit-rezonans tamografik usul deb ataladi.","poligrafik usul deb ataladi.","tomografik usul deb ataladi.","pozitron-emission tamografik usul deb ataladi."]},
+  {"q":"Fizik kattalik birliklarini qayta tiklash va ularni saqlash uchun xizmat qiladigan o'lchov asboblari (2)...","options":["Etalon o'lchash asboblari deb ataladi.","ishchi o'lchash asboblari deb ataladi.","namunaviy o'lchash asboblari deb ataladi.","texnik o'lchash asboblari deb ataladi."]},
+  {"q":"Qaysi termometrlar qarshilik termometrlari guruhiga kiradi:","options":["Metall o'tkazgichli termometrlar, yarim o'tkazgichli termometrlar","SHisha termometrlar, dilatometrik va bimetalik termometrlar.","Termoelektrik termometrlar.","Gazli, suyuqlikyi, bug'-suyuqlikli termometrlar."]},
+  {"q":"Suyuqlikli termometrlar qaysi diapazondagi haroratni o'lchash uchun mo'ljallangan (2):","options":["– 2000C dan + 6000C gacha","0C dan + 5000C gacha","+500C dan + 10000C gacha","00C dan + 10000C gacha"]},
+  {"q":"Suyuqlik yoki qattiq  jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar (2):","options":["Kengayish termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Karshilik termometrlar"]},
+  {"q":"Elektr qarshilikning o'zgarishiga asoslangan termometlar (2):","options":["Qarshilik termometlari","Nurlanish termometlari","Termoelektr termometlari","Kengayish termometrlari"]},
+  {"q":"Monometrik termometrlar qaysi diapozondagi temperaturani o'lchash uchun mo'ljallangan (2):","options":["- 500C dan + 10000C  gacha","- 200 C dan + 600 C gacha","0 C dan + 500 C gacha","260 C dan + 1100 C gacha"]},
+  {"q":"Qattiq  jismlarni hajmi yoki chiziqli o'lchamlarining o'zgarishiga asoslangan termometrlar","options":["Dilatometrik termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Karshilik termometrlar"]},
+  {"q":"Elektroensefalografiya usuli yordamida bosh miya neyronlarining aktivligini ko'rsatib beradigan natija qanday nomlanadi.","options":["elektroensefalogramma deb ataladi.","elektrokardiogramma deb ataladi.","elektrobiopotensialogramma deb ataladi.","magnitoensefalogramma deb ataladi."]},
+  {"q":"Qattiq  jismlarni hajmi yoki chiziqli o'lchamlarining o'zgarishiga asoslangan termometrlar (2):","options":["Bimetalli termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Karshilik termometrlar"]},
+  {"q":"Moddalar xajmi o'zgarmas bo'lganda temperatura o'zgarishi bilan bosimning o'zgarishiga asoslangan termometrlar (3):","options":["Manometrik termometrlar","kengayish termometrlari","qarshilik termometrlari","termoelektr termometrlari"]},
+  {"q":"Nurlanish termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (4):","options":["-2000C dan +6000C gacha","-00C dan +5000C gacha","-500C dan +60000C gacha","100C dan +3000C gacha"]},
+  {"q":"Yurak biopotensialini o'lchashdagi  natija qanday nomlanadi.","options":["elektrokardiogramma deb ataladi.","elektroensefalogramma deb ataladi.","elektrobiopotensialogramma deb ataladi.","magnitoensefalogramma deb ataladi."]},
+  {"q":"Elektrolit eritmalarining konsentratsiyasini ularning elektr utkazuvchanligiga ko'ra ulchash .","options":["Konduktometrik usul deb ataladi,","Optik usul deb ataladi,","Patensiometrik usul deb aytiladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Qattiq jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar (2):","options":["dilatometrik termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Karshilik termometrlar"]},
+  {"q":"Qattiq  jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar (3):","options":["Bimetalli termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Qarshilik termometrlar"]},
+  {"q":"Kvazimonoxromatik termometrlar  qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["700°C dan  6000°C gacha","-200°C dan 600°C gacha","-0°C dan  500°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Qanday xatolik metrologik tavsifda meyorlangan bo'ladi (2):","options":["Keltirilgan xatolik","absolyut xatolik","instrumental xatolik","muntazam xatolik"]},
+  {"q":"O'lchov asbobining qanday xatoligi o'lchash chegarasiga bog'lik ravishda o'sadi:","options":["absolyut xatolik","additiv xatolik","multiplikativ xatolik","instrumental xatolik"]},
+  {"q":"Kengayish termometrlarining suyuqligi sifatida qanday ximiyaviy moddalar ishlatiladi (2):","options":["Simob, toluol, etanol","Suv, yog', azot","Kislorod, ftor, xlor","Geliy, neon, argon"]},
+  {"q":"Spektral nisbatli pirometrlat (termometrlar)   qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["300°C dan  2800°C gacha","-200°C dan 600°C gacha","-0°C dan  500°C gacha","10°C dan 300°C gacha"]},
+  {"q":"To'liq nurlanish pirometrlat (termometrlar) qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-50°C dan  3500°C gacha","-200°C dan 600°C gacha","-0°C dan  500°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Qarshilik termometrlarida gisterezis xolati nima?","options":["Temperatura oshib borishi va kamayib borishida xar xil qiymatlarni ko'rsatishi.","Temperatura oshib borishida va kamayib borishida bir xil qiymatlarni ko'rsatishi.","Temperatura oshib borishida bir xil qiymatlarni ko'rsatishi.","Temperatura kamaqib borishida bir xil qiymatlarni ko'rsatishi."]},
+  {"q":"O'zgarmas tok zanjirida kuchlanish qiymati 16 V tok kuchining qiymati 4 A, qarshilikning qiymatini aniqlang:","options":["4 om","5om","10 om","16 om"]},
+  {"q":"Qanday qiyoslash birlamchi qiyoslash deb ataladi.","options":["Ishlab chiqarishdan so'ng o'tkaziladigan yoki ta'mirlashdan keyin o'tkaziladigan qiyoslash birlamchi qiyoslash deb ataladi.","Qiyoslashlararo intervalining muddati tugagandan so'ng o'tkaziladigan  qiyoslash birlamchi qiyoslash deb ataladi.","Xar oyda o'tkaziladigan  qiyoslash birlamchi qiyoslash deb ataladi.","Ma'lum bir muddatda o'tkaziladigan  qiyoslash birlamchi qiyoslash deb ataladi."]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish 0,5 marta oshganda ajralib chiqqan quvvat qanday o'zgaradi:","options":["2 marta kamayadi","2 marta oshadi","0,25 marta oshadi","0,25 marta kamayadi"]},
+  {"q":"Qanday qiyoslash davriy qiyoslash deb ataladi.","options":["Qiyoslashlararo intervalining muddati tugagandan so'ng o'tkaziladigan  qiyoslash davriy qiyoslash deb ataladi.","Ishlab chiqarishdan so'ng o'tkaziladigan yoki ta'mirlashdan keyin o'tkaziladigan qiyoslash birlamchi qiyoslash deb ataladi.","Xar oyda o'tkaziladigan  qiyoslash birlamchi qiyoslash deb ataladi.","Ma'lum bir muddatda o'tkaziladigan  qiyoslash birlamchi qiyoslash deb ataladi."]},
+  {"q":"Dilatometrik va bimetalli termometrlar   qanday diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["- 150°C dan  700°C gacha","-200°C dan 600°C gacha","-0°C dan  500°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Galvonometrning ko'rsatishi 400 mA va o'lchanayotgan tok kuchining haqiqiy qiymati 392 mA bo'lganda, galvanometrning nisbiy xatoligini aniq'lang:","options":["2,04%","1,5%","2,0%","2,1%"]},
+  {"q":"O'lchash chegarasi 50 A ga teng bo'lgan ampermetrning ko'rsatishi 20 A va o'lchanayotgan tok kuchining xaqiqiy qiymati 19 A ga teng. Ampermetrning keltirilgan xatoligini aniqlang (2):","options":["2,0%","3,0%","4,0%","1,0%"]},
+  {"q":"Absolyut xatolik nima?","options":["Kattalikning xaqiqiy qiymati bilan o'lchangan qiymati o'rtasidaga farqni ko'rsatib beradigan xatolik...","kattalikning xaqiqiy qiymatini o'lchangan qiymatiga nisbati orqali aniqlanadigan xatolik...","kattalikning o'lchangan qiymatini xaqiqiy qiymatiga  nisbati orqali aniqlanadigan xatolik.","Absolyut xatolikni o'lchangan qiymatga  nisbati orqali aniqlanadigan xatolik."]},
+  {"q":"Vattmetrning ko'rsatishi Wn= 100 Vt va o'lchanayotgan quvvatning haqiqiy qiymati Wnx = 99 Vt bo'lganda vattmetrning nisbiy xatoligini aniqlang:","options":["1,01 %","1,05 %","2,01 %","2,05 %"]},
+  {"q":"Ulchash chegarasi 50 V ga teng bo'lgan voltmetrning ko'rsatishi 40 B  va ulchanayotgan kuchlanishning  haqiqiy qiymati 39 V ga teng. Voltmetrning  keltirilgan  xatoligyni aniqlang:","options":["2,0 %","4,0 %","1,0 %","3,0 %"]},
+  {"q":"O'lchash asbobining o'lchash qiymati 60 Om, o'lchanayotgan qarshilikning qiymati 59 Om ga teng. Ommetrning nisbiy xatoligini aniqlang.","options":["1,69 %","2,69  %","3,69  %","0,69  %"]},
+  {"q":"O'lchash asbobining maksimal o'lchash chegarasi 100 Omga teng. Ommetrning keltirilgan xatoligini aniqlang (o'lchash 60 Om, haqiqiy 59 Om).","options":["1,0 %","2,0  %","3,0 %","0,5  %"]},
+  {"q":"Termoelektrik termometrlar qanday diapazondagi haroratni o'lchash uchun mo'ljallangan:","options":["- 2000C dan  25000C gacha","00C dan   5000C gacha","00C dan  10000C gacha","-   100C dan  3000C gacha."]},
+  {"q":"Suyuqlik yoki gazlarni bosimini o'zgarishi asosida temperatura o'lchash asboblarining nomini aniqlab bering:","options":["Monometrik termometrlar","Kengayish termometrlar","Termoelektr termometrlar","Qarshilik termometrlar"]},
+  {"q":"Elektr qarshilikning o'zgarishiga asoslangan termometlar (3):","options":["Qarshilik termometlari","Nurlanish termometlari","Termoelektr termometlari","Kengayish termometrlari"]},
+  {"q":"Qanday aniqlik klassiga teng bo'lgan Dilatometrik termometrlar ishlab chiqariladi?","options":["1,5 – 2,5  aniqlik klassiga teng bo'lgan termometrlar","1,0 – 4,0  aniqlik klassiga teng bo'lgan termometrlar","2,0 – 2,5  aniqlik klassiga teng bo'lgan termometrlar","0,5 – 4,0  aniqlik klassiga teng bo'lgan termometrlar"]},
+  {"q":"Qanday aniqlik klassiga teng bo'lgan Bimetalli termometrlar ishlab chiqariladi?","options":["1,0 – 1,5  aniqlik klassiga teng bo'lgan termometrlar","1,0 – 4,0  aniqlik klassiga teng bo'lgan termometrlar","2,0 – 2,5  aniqlik klassiga teng bo'lgan termometrlar","0,5 – 4,0  aniqlik klassiga teng bo'lgan termometrlar"]},
+  {"q":"Kengayish termometrlarining suyukligi sifatida qanday ximiyaviy moddalar   ishlatiladi (Galliy):","options":["Галлий-индий-Қалай","Suv, yog, azot","Kislorod, ftor, xlor","Geliy, neon, argon"]},
+  {"q":"Elektrokardiograflar o'zining tuzilishi va ishlash printsipi bo'yicha qanday guruhlarga ajratiladi:","options":["1 kanalli, 3 kanalli, 6 kanalli, 12 kanalli, 15 kanallilarga bo'linadi.","4 kanalli, 8 kanalli, 16 kanalli, 32 kanallilarga bo'linadi.","2 kanalli, 4 kanalli, 6 kanalli, 8 kanallilarga bo'linadi.","3 kanalli, 6 kanalli, 9 kanalli, 12 kanallilarga bo'linadi."]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  nur sindirish ko'rsatkichini o'lchashga asoslangan usul  ...:","options":["Refraktometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"O'zgarmas tok zanjirida kuchlanish qiymati 30 V tok kuchining qiymati 15 A, qarshilikning qiymatini aniqlang:","options":["2 Om","5 Om","10 Om","15 om"]},
+  {"q":"Voltmetrning xaqiqiy qiymati 220 V o'lchangan qiymati 217 V, voltmetrning nisbiy xatoligini aniqlang:","options":["1,38 %","2,38 %","3,38 %","0,38 %"]},
+  {"q":"Hozirgi zamon elektrokardiograflari o'zining tuzilishi, ishlash printsipi va kanallari miqdoriga qarab qyuidagi guruhlarga bo'linadi:","options":["1 kanalli, 3 kanalli, 6 kanalli, 12 kanallilarga bo'linadi.","4 kanalli, 8 kanalli, 16 kanalli, 32 kanallilarga bo'linadi.","2 kanalli, 4 kanalli, 6 kanalli, 8 kanallilarga bo'linadi.","3 kanalli, 6 kanalli, 9 kanalli, 12 kanallilarga bo'linadi."]},
+  {"q":"Nurlanish termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (5):","options":["-  50°S dan +6000°S gacha","-200°S dan +600°S gacha","- 0°S dan +500°S gacha","0°S dan +1100°S gacha."]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish 4 marta oshganda ajralib chiqqan quvvat qanday o'zgaradi:","options":["16 marta oshadi","4 marta oshadi","4 marta kamayadi","16 marta kamayadi"]},
+  {"q":"Galvanometrning aniqlik klassi 0,5 ga teng. Galvanometrning to'g'ri ishlash chegarasidagi maksimal keltirilgan xatolik qiymatini aniqlang:","options":["0,5 %","1,0 %","1,5%","2,5%"]},
+  {"q":"Absolyut xatolikni o'lchov asbobining chegaraviy qiymatyga nisbati bilan aniqlanadigan xatolik","options":["keltirilgan xatolik deb ataladi","absolyut xatolik deb ataladi.","nisbiy xatolik deb ataladi.","Instrumental xatolik deb ataladi"]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  qizil elektrod qaysi qo'lga yoki oyoqqa ulanadi?","options":["o'ng qo'lga;","chap  qo'lga;","o'ng oyoqga;","chap  oyoqga."]},
+  {"q":"O'lchash chegarasi 25 μA ga teng bo'lgan ampermetrning ko'rsatishi 20 A va o'lchanayotgan tok kuchining xaqiqiy qiymati 19 A ga teng. Ampermetrning keltirilgan xatoligini aniqlang (3):","options":["4,0%","2,0%","3,0%","1,0%"]},
+  {"q":"Absolyut xatolikning kattalikning o'lchangan qiymatiga nisbati bilan aniqlanadigan xatolik…:","options":["Nisbiy xatolik deb ataladi","Absolyut xatolik deb ataladi","Keltirilgan xatolik deb ataladi","Instrumental xatolik deb ataladi"]},
+  {"q":"Vattmetrning ko'rsatishi Wn = 100 vt va o'lchanayotgan quvvatning xaqiqiy qiymati Wnx = 99 vt bo'lganda vattmetrning nisbiy xatoligini aniqlang (2):","options":["1,01 %","2,1 %","2,5 %","1,1 %"]},
+  {"q":"O'lchash chegarasi 200 V ga teng bo'lgan voltmetrning ko'rsatishi 160 V ga  va o'lchanayotgan kuchlanishning xaqiqiy 152 V ga teng voltmetrning keltirilgan xatoligyni aniqlang.","options":["4,0%","2,0%","1,0%","3,0%"]},
+  {"q":"Fizik kattalik birliklarini qayta tiklash va ularni saqlash uchun xizmat qiladigan o'lchov asboblari (3)...","options":["Etalon o'lchov asboblari deb ataladi.","darajalangan o'lchov asboblari deb ataladi.","ishchi o'lchov asboblari deb ataladi.","texnik o'lchov asboblari deb ataladi."]},
+  {"q":"Qaysi termometrlar monometrik termometrlar guruhiga kiradi (2):","options":["Gazli, suyuqlikyi, bug'-suyuqlikli termometrlar.","SHisha termometrlar, dilatometrik va bimetalik termometrlar.","Termoelektrik termometrlar.","Metall o'tkazgichli termometrlar, yarim o'tkazgichli termometrlar."]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  sariq elektrod qaysi qo'lga yoki oyoqqa ulanadi?","options":["chap  qo'lga;","o'ng qo'lga;","o'ng oyoqga;","chap  oyoqga."]},
+  {"q":"Suyuqlikli termometrlar qaysi diapazondagi haroratni o'lchash uchun mo'ljallangan (3):","options":["– 2000C dan + 6000C gacha","- 00C dan + 5000C gacha","+500C dan + 10000C gacha","-00C dan + 10000C gacha"]},
+  {"q":"Qattiq  jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar (4):","options":["Dilatometrik termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Qarshilik termometrlar"]},
+  {"q":"Elektr qarshilikning o'zgarishiga asoslangan termometlar (4):","options":["Qarshilik termometlari","Nurlanish termometlari","Termoelektr termometlari","Kengayish termometrlari"]},
+  {"q":"Monometrik termometrlar qaysi diapozondagi temperaturani o'lchash uchun mo'ljallangan (3):","options":["- 50 C dan + 1000 C gacha","- 200 C dan + 600 C gacha","0 C dan + 500 C gacha","- 10 C dan + 300 C gacha"]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  yashil elektrod qaysi qo'lga yoki oyoqqa ulanadi?","options":["chap  oyoqga","chap  qo'lga;","o'ng qo'lga;","o'ng oyoqga;"]},
+  {"q":"Simobli termometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-350C dan +6000C gacha","-2000C dan +6000C gacha","-00C dan +5000C gacha","100C dan +3000C gacha"]},
+  {"q":"Kengayish termometrlarining suyuqligi sifatida qanday ximiyaviy moddalar  ishlatiladi (Kerosin, pentan):","options":["Kerosin, pentan, galliy-indiy - qalay","Suv, yog, azot","Kislorod, ftor, xlor","Geliy, neon, argon"]},
+  {"q":"Chastotaning xaqiyqiy qiymati 50 Grts  o'lchangan qiymati 45 Grts, absolyut xatoligini aniqlang:","options":["2,2 %","2,5 %","2,0 %","3,0 %"]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  qora elektrod qaysi qo'lga yoki oyoqqa ulanadi?","options":["o'ng oyoqga;","chap  oyoqga","chap  qo'lga;","o'ng qo'lga."]},
+  {"q":"Metallarni chiziqli o'lchamlarini o'zgarishi asosida temperatura o'lchash asboblari:","options":["Dilatometrik termometrlari","manometrik termometrlar","qarshilik termometrlari","-termoelektr termometrlari"]},
+  {"q":"Optik pirometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["700°C dan  6000° C gacha","-200° C dan 600° C gacha","-0° C dan  500° C gacha","10° C dan 300° C gacha"]},
+  {"q":"Kengayish termometrlarining suyuqligi sifatida qanday ximiyaviy moddalar ishlatiladi (Galliy-indiy-qalay):","options":["Galliy-indiy-qalay","Suv, yog', azot","Kislorod, ftor, xlor","Geliy, neon, argon"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning solishtirma qarshiligiga ko'ra o'lchash","options":["Konduktometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Optik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"O'zgarmas tok zanjirida kuchlanish qiymati 15V tok kuchining qiymati 3 A, qarshilikning qiymatini aniqlang:","options":["5 om","3 om","2 om","-15 om"]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish 1 marta oshganda ajralib chiqqan quvvat qanday o'zgaradi:","options":["o'zgarmaydi","2 marta oshadi","2 marta kamayadi","4 marta kamayadi"]},
+  {"q":"Yurak biopotensialini o'lchash uchun mo'ljallangan o'lchash asbobi (2) .......","options":["elektrokardiograflar deb ataladi.","elektroensefalograflar deb ataladi.","elektropotensiallar deb ataladi.","magnitoensefalograflar deb ataladi."]},
+  {"q":"Galvonometrning ko'rsatishi 20 mA va o'lchanayotgan tok kuchining haqiqiy qiymati 18 mA bo'lganda, galvanometrning nisbiy xatoligini aniq'lang:","options":["11,11 %","10,5 %","12,0 %","12,1 %"]},
+  {"q":"O'lchash chegarasi 25 A ga teng bo'lgan ampermetrning ko'rsatishi 20 A va o'lchanayotgan tok kuchining xaqiqiy qiymati 17 A ga teng. Ampermetrning keltirilgan xatoligini aniqlang:","options":["6,0%","2,0%","3,0%","4,0%"]},
+  {"q":"Yurak biopotensialini o'lchash uchun mo'ljallangan o'lchash asbobi (3) .......","options":["elektrokardiograflar deb ataladi.","elektroensefalograflar deb ataladi.","elektropotensiallar deb ataladi.","magnitoensefalograflar deb ataladi."]},
+  {"q":"Ulchash chegarasi 50 B ga teng bo'lgan voltmetrning ko'rsatishi 40 B  va ulchanayotgan kuchlanishning  haqiqiy qiymati 38 B ga teng. Voltmetrning  keltirilgan  xatoligyni aniqlang (2):","options":["4,0 %","2,0 %","1,0  %","3,0  %"]},
+  {"q":"O'lchash asbobining o'lchash qiymati 60 Om, o'lchanayotgan qarshilikning qiymati 57 Om ga teng. Ommetrning nisbiy xatoligini aniqlang.","options":["5,2 %","3,2 %","4,2 %","2,2 %"]},
+  {"q":"O'lchash asbobining maksimal o'lchash chegarasi 100 om. Ommetrning keltirilgan xatoligini aniqlang (60 Om o'lchash, 57 Om haqiqiy):","options":["3,0 %","4,0 %","1,0 %","2,0 %"]},
+  {"q":"Fizik kattalik birliklarini qayta tiklash va ularni saqlash uchun xizmat qiladigan o'lchov asboblari (4)....:","options":["Etalon o'lchov asboblari deb ataladi.","ishchi o'lchov asboblari deb ataladi.","namunaviy o'lchov asboblari deb ataladi.","texnik o'lchov asboblari deb ataladi."]},
+  {"q":"Suyuq'likli termometrlar qaysi diapazondagi haroratni o'lchash uchun mo'ljallangan (4):","options":["- 2000C dan  6000C gacha","00C dan   5000C gacha","00C dan  10000C gacha","100C dan  3000C gacha."]},
+  {"q":"Qattiq jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar (5):","options":["Bimetalli termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Qarshilik termometrlar"]},
+  {"q":"Bosh miyadagi elektrik potensiallarni o'lchashga asoslangan usul (2) .......","options":["elektroensefalografiya usuli deb ataladi.","elektrokardiografiya usuli deb ataladi.","elektrobiopotensialografiya usuli deb ataladi.","magnitoensefalografiya usuli deb ataladi."]},
+  {"q":"Elektr qarshilikning o'zgarishiga asoslangan termometlar (5):","options":["Qarshilik termometlari","Nurlanish termometlari","Termoelektr termometlari","Kengayish termometrlari"]},
+  {"q":"Qattiq jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar (6):","options":["Bimetalli termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Qarshilik termometrlar"]},
+  {"q":"Monometrik termometrlar qaysi diapozondagi temperaturani o'lchash uchun mo'ljallangan (4):","options":["- 50 C dan   1000 C gacha","- 200 C dan  600 C gacha","- 0 C dan  500 C gacha","- 260 C dan   1100 C gacha"]},
+  {"q":"O'lchov vositalari asosan  qanday o'lchov asboblariga bo'linadi (2):","options":["etalon, namunaviy, ishchi","ampermetr, voltmetr, ommetr.","o'lchov, standart, namuna.","absolyut, nisbiy, keltirilgan."]},
+  {"q":"Kvazimonoxromatik termometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (2):","options":["700°C dan     6000°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Yurak biopotensialini o'lchashga asoslangan usul (2) .......","options":["elektrokardiografiya usuli deb ataladi.","elektroensefalografiya usuli deb ataladi.","elektrobiopotensialografiya usuli deb ataladi.","magnitoensefalografiya usuli deb ataladi."]},
+  {"q":"Spektral nisbatli pirometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (2):","options":["300°C dan     2800°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"To'liq nurlanishli pirometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-50°C dan     3500°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Metall o'tkazgichli qarshilik termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-260°C dan     1100°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Elektrolit eritmalarining konsentratsiyasini ularning elektr o'tkazuvchanligiga ko'ra o'lchash (2)","options":["Konduktometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Optik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  pH  ko'rsatkichiga  ko'ra o'lchash ...(2):","options":["Potentsiometrik usul deb ataladi,","Optik usul deb ataladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  nur o'tkazish koeffitsientiga   ko'ra o'lchash (2)","options":["spektrofotometrik usul deb ataladi","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  qutblanish tekisligining burilish burchagini o'zgarishiga ko'ra o'lchash ...(2):","options":["Polyarimetrik usul deb ataladi,","Potentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Bosh miyadagi magnit maydoni ta'siridagi o'zgarishlarni o'lchashga asoslangan usul (2) .......","options":["magnitoensefalografiya usuli deb ataladi.","elektroensefalografiya usuli deb ataladi.","elektrokardiografiya usuli deb ataladi.","elektrobiopotensialografiya usuli deb ataladi."]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  nurning sochilishiga ko'ra o'lchash (2)...","options":["Nefelometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"O'zgarmas tok zanjirida kuchlanish qiymati 100 V tok kuchining qiymati 5 A, qarshilikning qiymatini aniqlang:","options":["20  Om","5 Om","10 Om","15om"]},
+  {"q":"Yarim o'tkazgichli qarshilik termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-270°C dan     600°C gacha","-20°C dan    5000°C gacha","-50°C dan    600°C gacha","10°C dan 3000°C gacha"]},
+  {"q":"Termoelektrik termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-200°C dan     2500°C gacha","-20°C dan    5000°C gacha","-50°C dan    600°C gacha","10°C dan 3000°C gacha"]},
+  {"q":"Gazli monometrik termometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-150°C dan     1000°C gacha","-20°C dan    5000°C gacha","-50°C dan    6000°C gacha","10°C dan 3000°C gacha"]},
+  {"q":"Suyuqlikli monometrik termometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-150°C dan     600°C gacha","-20°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Kvazimonoxromatik termometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (3):","options":["700°C dan     6000°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Spektral nisbatli pirometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (3):","options":["300°C dan     2800°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"To'liq nurlanish pirometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (2):","options":["-50°C dan     3500°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning elektr o'tkazuvchanligiga ko'ra o'lchash (3)","options":["Konduktometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Optik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish 3 marta oshganda ajralib chiqqan quvvat qanday o'zgaradi:","options":["9 marta oshadi","9 marta kamayadi","3 marta oshadi","3 marta kamayadi"]},
+  {"q":"Galvanometrning aniqlik klassi 0,2 ga teng. Galvanometrning to'g'ri ishlash chegarasidagi maksimal keltirilgan xatolik qiymatini aniqlang:","options":["0,2 %","1,0 %","1,5%","2,0%"]},
+  {"q":"Radioaktiv nurlarning suyuqlikdan o'tishda yutilishga asoslangan zichlik o'lchagich nomini aniqlang:","options":["Radioizotopli zichlik o'lchagich","Qalqovichli zichlik o'lchagich","Gidrostatik zichlik o'lchagich","Vaznli zichlik o'lchagich"]},
+  {"q":"Kondensasion monometrik termometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan:","options":["-50°C dan     300°C gacha","-20°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"O'lchash chegarasi 25 μA ga teng bo'lgan ampermetrning ko'rsatishi 20 μA va o'lchanaetgan tok kuchining xaqiqiy qiymati 17 μA ga teng. Ampermetrning keltirilgan xatoligini aniqlang:","options":["6,0%","8,0%","5,0%","4,0%"]},
+  {"q":"Odam organizmidagi hosil bo'ladigan har xil fizoilogik jarayonlarni magnit maydoni ta'siridagi o'zgarishlarni o'lchashga asoslangan usul (2) .......  .","options":["magnit-rezonans tamografik usul deb ataladi.","poligrafik usul deb ataladi.","tomografik usul deb ataladi.","pozitron-emission tamografik usul deb ataladi."]},
+  {"q":"To'liq nurlanish pirometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (3):","options":["-  50°S dan +3500°S gacha","-200°S dan +600°S gacha","10°S dan +300°S gacha","0°S dan +1100°S gacha."]},
+  {"q":"Eritmalarining kontsentratsiyasini ularning nur o'tkazuvchanlik koeffitsientini o'lchashga asosan aniqlash usuli …………..","options":["Spektrofotometrik usul deb ataladi,","Potentsiometrik usul deb ataladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Voltmetr zanjirdagi kuchlanishni to'g'ri o'lchashi uchun zanjirga qanday ulanadi:","options":["Parallel","Ketma-ket","Aralash","Parallel va ketma-ket"]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish ikki marta oshganda ajralib chiqqan quvvat qanday o'zgaradi (3):","options":["4 marta oshadi","2 marta kamayadi","2 marta oshadi","4 marta kamayadi"]},
+  {"q":"Vaznli zichlik o'lchagichlar qaysi diapazondagi suyuqliklarni zichligini o'lchash uchun mo'ljallangan?","options":["500   -   2500 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan.","100   -   250 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan.","200   - 500 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan.","300   -   1000 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan."]},
+  {"q":"Radioaktiv nurlarning suyuqlikdan o'tishda yutilishga asoslangan zichlik o'lchagich nomini aniqlang (2):","options":["Radioizotopli zichlik o'lchagich","Qalqovichli zichlik o'lchagich","Gidrostatik zichlik o'lchagich","Vaznli zichlik o'lchagich"]},
+  {"q":"Qalqovichli zichlik o'lchagichlar qaysi diapazondagi suyuqliklarni zichligini o'lchash uchun mo'ljallangan?","options":["1000   -   1400 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan.","100   -   250 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan.","200   - 500 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan.","300   -   1000 kg/m3   oralig'idagi zichlikni o'lchash uchun mo'ljallangan."]},
+  {"q":"Qalqovichli zichlik o'lchagichlarning yo'l qo'yishi mumkin bo'lgan xatolik darajasi necha foizni tashkil qiladi?","options":["± 2 foizni tashkil qiladi","± 0,05 foizni tashkil qiladi","± 0,5 foizni tashkil qiladi","± 1 foizni tashkil qiladi"]},
+  {"q":"Vaznli zichlik o'lchagichlarning yo'l qo'yishi mumkin bo'gan maksimal xatolik darajasi necha foizni tashkil qiladi?","options":["± 2 foizni tashkil qiladi","± 1,5 foizni tashkil qiladi","± 0,5 foizni tashkil qiladi","± 3 foizni tashkil qiladi"]},
+  {"q":"O'lchash chegarasi 50 μA ga teng bo'lgan ampermetrning ko'rsatishi 40 A va o'lchanayotgan tok kuchining xaqiqiy qiymati 38 A ga teng. Ampermetrning keltirilgan xatoligini aniqlang:","options":["4,0%","2,0%","3,0%","5,0%"]},
+  {"q":"Sharikli viskozsmetr bo'yicha aniqlanishi mumkin bo'lgan qovushqoqlikni chegarasini aniqlab bering (2):","options":["0,01 dan 100 Pa  s gacha.","0,001 dan 10 Pa  s gacha.","0,01 dan 1000 Pa  s gacha.","0,001 dan 0.1 Pa  s gacha."]},
+  {"q":"Absolyut xatolikni o'lchash asbobini maksimal o'lchash chegarasiga nisbati bilan aniqlanadigan xatolik…:","options":["Keltirilgan xatolik deb ataladi","Absolyut xatolik deb ataladi","Nisbiy xatolik deb ataladi","Instrumental xatolik deb ataladi"]},
+  {"q":"Vattmetrning ko'rsatishi Wn = 50 vt va o'lchanayotgan quvvatning xaqiqiy qiymati Wnx = 48 vt bo'lganda vattmetrning nisbiy xatoligini aniqlang:","options":["4,16 %","2,15 %","2,50 %","1,00  %"]},
+  {"q":"O'lchash chegarasi 200 V ga teng bo'lgan voltmetrning ko'rsatishi 180 V ga va o'lchanayotgan kuchlanishning xaqiqiy 177 V ga teng voltmetrning keltirilgan xatoligyni aniqlang.","options":["1,5%","2,5%","4,5%","6,5%"]},
+  {"q":"Yurak biopotensialini o'lchashdagi  natija qanday nomlanadi (2).","options":["elektrokardiogramma deb ataladi.","elektroensefalogramma deb ataladi.","elektrobiopotensialogramma deb ataladi.","magnitoensefalogramma deb ataladi"]},
+  {"q":"Qaysi termometrlar monometrik termometrlar guruhiga kiradi (3):","options":["Gazli, suyuqlikyi, bug'-suyuqlikli termometrlar.","Shisha termometrlar, dilatometrik va bimetalik termometrlar.","Termoelektrik termometrlar.","Metall o'tkazgichli termometrlar, yarim o'tkazgichli termometrlar."]},
+  {"q":"Elektrolit eritmalarining konsentratsiyasini ularning elektr utkazuvchanligiga ko'ra o'lchash ……..","options":["Konduktometrik usul deb ataladi,","Patensiometrik usul deb aytiladi,","Optik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"O'lchov asboblaridan 0,5 aniqlik klassiga ega bo'lgan o'lchash asboblari necha foyizgacha keltirilgan xatolikka yo'l qo'yishi mumkin:","options":["0,5 %  gacha","0,1 %  gacha","0,05 %  gacha","- 0,01 %  gacha"]},
+  {"q":"O'lchov asboblaridan 0,05 aniqlik klassiga ega bo'lgan o'lchash asboblari necha foyizgacha keltirilgan xatolikka yo'l qo'yishi mumkin:","options":["0,05 %  gacha","0,5 %  gacha","0,1 %  gacha","0,01 %  gacha"]},
+  {"q":"Kvazimonoxromatik termometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (4):","options":["700°C dan     6000°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Spektral nisbatli pirometrlar qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (4):","options":["300°C dan     2800°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"To'liq nurlanish pirometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (4):","options":["-50°C dan     3500°C gacha","-0°C dan    500°C gacha","-50°C dan    600°C gacha","10°C dan 300°C gacha"]},
+  {"q":"O'zgarmas tok zanjirida kuchlanish qiymati 40 V tok kuchining qiymati 5A, qarshilikning qiymatini aniqlang (2):","options":["8 om","10 om","5 om","15om"]},
+  {"q":"Qarshiligi o'zgarmas bo'lgan zanjir uchlaridagi kuchlanish 5 marta oshganda ajralib chiqqan quvvat qanday o'zgaradi (2):","options":["25  marta oshadi","25 marta kamayadi","5  marta oshadi","5 marta kamayadi"]},
+  {"q":"Kappilyar viskozimetri bo'yicha aniqlanishi mumkin bo'lgan qovushqoqlikning chegarasini aniqlab bering (3):","options":["0,001 dan 10 Pas gacha","0,1 dan 100 Pa s gacha","0,01 dan 1000 Pas gacha","0,001 dan 0,1 Pas gacha"]},
+  {"q":"Galvanometrning aniqlik klassi 0,01 ga teng. Galvanometrning to'g'ri ishlash chegarasidagi maksimal keltirilgan xatolik qiymatini aniqlang (3):","options":["0,01 %","0,05 %","0,1 %","0,5 %"]},
+  {"q":"Radijaktiv nurlarning suyuqlikdan o'tishda yutilishga asoslangan zichlik o'lchagich nomini aniqlang (2):","options":["Radioizotopli zichlik o'lchagich","Qalqovichli zichlik o'lchagich","Gidrostatik zichlik o'lchagich","Vaznli zichlik o'lchagich"]},
+  {"q":"Galvonometrning ko'rsatishi 100 mA va o'lchanayotgan tok kuchining haqiqiy qiymati 98 mA bo'lganda, galvanometrning nisbiy xatoligini aniq'lang (2):","options":["2,04%","1,5%","2,0%","2,1%"]},
+  {"q":"Absolyut xatolikni o'lchov asbobining chegaraviy qiymatyga nisbati bilan aniqlanadigan xatolik ...:(2)","options":["keltirilgan xatolik deb ataladi","absolyut xatolik deb ataladi.","nisbiy xatolik deb ataladi.","Instrumental xatolik deb ataladi"]},
+  {"q":"O'lchash chegarasi 25 A ga teng bo'lgan ampermetrning ko'rsatishi 20 A va o'lchanayotgan tok kuchining xaqiqiy qiymati 18 A ga teng. Ampermetrning keltirilgan xatoligini aniqlang (2):","options":["8,0%","3,0%","4,0%","6,0%"]},
+  {"q":"Sharikli viskozsmetr bo'yicha aniqlanishi mumkin bo'lgan qovushqoqlikni chegarasini aniqlab bering (3):","options":["0,001dan 10 Pa  s gacha.","0,1 dan 100 Pa  s gacha.","0,01 dan 1000 Pa  s gacha.","0,001 dan 0.1 Pa  s gacha."]},
+  {"q":"Vattmetrning ko'rsatishi Wn= 100 vt va o'lchanayotgan quvvatning haqiqiy qiymati Wnx = 98 vt bo'lganda vattmetrning nisbiy xatoligini aniqlang (2):","options":["2,04%","1,5 %","2,1 %","2,5 %"]},
+  {"q":"O'lchash chegarasi 50 V ga teng bo'lgan voltmetrning ko'rsatishi 40 V  va o'lchanayotgan kuchlanishning  haqiqiy qiymati 38 V ga teng. Voltmetrning  keltirilgan  xatoligyni aniqlang (2):","options":["4,0%","2,0%","6,0%","8,0%"]},
+  {"q":"Qattiq jismlar hajmi yoki chiziqli o'lchamlarning o'zgarishiga asoslangan termometrlar (7):","options":["Dilatometrik termometrlar","Monometrik termometrlar","Termoelektr termometrlar","Qarshilik termometrlar"]},
+  {"q":"Elektr qarshilikning o'zgarishiga asoslangan termometlar (6):","options":["Qarshilik termometlari","Nurlanish termometlari","Termoelektr termometlari","Kengayish termometrlari"]},
+  {"q":"Monometrik termometrlar qaysi diapozondagi temperaturani o'lchash uchun mo'ljallangan (5):","options":["- 50 C dan   1000 C gacha","- 200 0C dan  600 0C gacha","0 C dan  500 C gacha","- 260 C dan   1100 C gacha"]},
+  {"q":"Hozirgi zamon elektrokardiograflari o'zining tuzilishi, ishlash printsipi va kanallari miqdoriga qarab qanday guruhlarga bo'linadi (2)?","options":["1 kanalli, 3 kanalli, 6 kanalli, 12 kanallilarga bo'linadi.","4 kanalli, 8 kanalli, 16 kanalli, 32 kanallilarga bo'linadi.","2 kanalli, 4 kanalli, 6 kanalli, 8 kanallilarga bo'linadi.","3 kanalli, 6 kanalli, 9 kanalli, 12 kanallilarga bo'linadi."]},
+  {"q":"Nurlanish termometrlari qaysi diapazondagi temperaturani o'lchash uchun mo'ljallangan (6):","options":["-50°C dan    6000°C gacha","-200°C dan     600°C gacha","-0°C dan    500°C gacha","10°C dan 300°C gacha"]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  qizil elektrod qaysi qo'lga yoki oyoqqa ulanadi (2)?","options":["o'ng qo'lga;","chap  qo'lga;","o'ng oyoqga;","chap  oyoqga."]},
+  {"q":"Suyuqlikning ma'lum bir doimiy xajmining vaznini uzluksiz tortib turishga asoslangan zichlik o'lchagich nomini aniqlang (2):","options":["Vaznli zichlik o'lchagich","Qalqovichli zichlik o'lchagich","Gidrositatik zichlik o'lchagich","Radioizotopik zichlik o'lchagich"]},
+  {"q":"Elektrolit eritmalarining konsentratsiyasini ularning elektr o'tkazuvchanligiga ko'ra o'lchash (4)","options":["Konduktometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Optik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  pH  ko'rsatkichiga  ko'ra o'lchash ...(3):","options":["Potentsiometrik usul deb ataladi,","Optik usul deb ataladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  nur o'tkazish koeffitsientiga   ko'ra o'lchash ...(3):","options":["Spektrofotometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  qutblanish tekisligini burilish burchagini o'lchashga asoslangan usul ...(3):","options":["polyarimetrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrolit eritmalarining kontsentratsiyasini ularning  nurning sochilishiga    ko'ra o'lchash ..(2)","options":["Nefelometrik usul deb ataladi,","Patentsiometrik usul deb aytiladi,","Konduktometrik usul deb ataladi,","Avtomatik usul deb ataladi,"]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  sariq elektrod qaysi qo'lga yoki oyoqqa ulanadi (2)?","options":["chap  qo'lga;","o'ng qo'lga;","o'ng oyoqga;","chap  oyoqga."]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  yashil elektrod qaysi qo'lga yoki oyoqqa ulanadi (2)?","options":["chap  oyoqga","chap  qo'lga;","o'ng qo'lga;","o'ng oyoqga;"]},
+  {"q":"Elektrokardiograf qurilmalarida tarmoq kabelining klemmalari ranglar bo'yicha ajratilgan:  qora elektrod qaysi qo'lga yoki oyoqqa ulanadi (2)?","options":["o'ng oyoqga;","chap  oyoqga","chap  qo'lga;","o'ng qo'lga."]}
+];
+
+// ===================== STATE =====================
+let quiz = [];
+let current = 0;
+let score = 0;
+let wrongs = [];
+let skipped = 0;
+let perTime = 60;
+let timer = null;
+let timeLeft = 0;
+let answered = false;
+let shuffledIndices = [];
+
+const LETTERS = ['A','B','D','E'];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function goSetup() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'flex';
+  clearInterval(timer);
+}
+
+function startQuiz() {
+  const cnt = Math.min(Math.max(parseInt(document.getElementById('count-input').value)||30,5), QUESTIONS.length);
+  perTime = Math.min(Math.max(parseInt(document.getElementById('time-input').value)||60,10),300);
+  const order = document.getElementById('order-input').value;
+
+  let indices = Array.from({length: QUESTIONS.length}, (_,i)=>i);
+  if (order === 'random') indices = shuffle(indices);
+  shuffledIndices = indices.slice(0, cnt);
+
+  quiz = shuffledIndices.map(i => {
+    const q = QUESTIONS[i];
+    // Shuffle options but track correct answer (index 0 = correct)
+    const optIndices = shuffle([0,1,2,3].slice(0, q.options.length));
+    const shuffledOpts = optIndices.map(j => q.options[j]);
+    const correctIndex = optIndices.indexOf(0);
+    return { q: q.q, options: shuffledOpts, correct: correctIndex };
+  });
+
+  current = 0; score = 0; wrongs = []; skipped = 0; answered = false;
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const total = quiz.length;
+  const q = quiz[current];
+
+  document.getElementById('prog-text').textContent = `${current+1} / ${total}`;
+  document.getElementById('score-live').innerHTML = `✅ ${score} &nbsp; ❌ ${current - score - skipped > 0 ? current-score-skipped : 0}`;
+  document.getElementById('prog-fill').style.width = `${(current/total)*100}%`;
+  document.getElementById('q-number').textContent = `Savol ${current+1}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('next-btn').style.display = 'none';
+
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectOption(i, btn);
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+
+  // Timer
+  clearInterval(timer);
+  timeLeft = perTime;
+  const badge = document.getElementById('timer-badge');
+  badge.textContent = timeLeft;
+  badge.classList.remove('urgent');
+
+  timer = setInterval(() => {
+    timeLeft--;
+    badge.textContent = timeLeft;
+    if (timeLeft <= 10) badge.classList.add('urgent');
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      if (!answered) autoSkip();
+    }
+  }, 1000);
+}
+
+function autoSkip() {
+  answered = true;
+  skipped++;
+  const q = quiz[current];
+  wrongs.push({ q: q.q, chosen: '(vaqt tugadi)', correct: q.options[q.correct], skipped: true });
+  // Show correct
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((b,i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+  });
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function selectOption(idx, btn) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timer);
+  const q = quiz[current];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  if (idx === q.correct) {
+    btn.classList.add('correct');
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    btns[q.correct].classList.add('correct');
+    wrongs.push({ q: q.q, chosen: q.options[idx], correct: q.options[q.correct] });
+  }
+  document.getElementById('score-live').innerHTML = `✅ ${score} &nbsp; ❌ ${current+1-score}`;
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= quiz.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  clearInterval(timer);
+  document.getElementById('quiz-screen').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'flex';
+
+  const total = quiz.length;
+  const pct = Math.round((score/total)*100);
+  document.getElementById('big-score').textContent = pct + '%';
+
+  let grade = pct >= 86 ? '🏆 A\'lo!' : pct >= 71 ? '👍 Yaxshi' : pct >= 56 ? '📚 Qoniqarli' : '😔 Qoniqarsiz';
+  document.getElementById('score-label').textContent = `${grade}  —  ${score} ta to'g'ri, ${total} savol`;
+
+  document.getElementById('r-correct').textContent = score;
+  document.getElementById('r-wrong').textContent = total - score - skipped;
+  document.getElementById('r-skipped').textContent = skipped;
+  document.getElementById('r-total').textContent = total;
+
+  const rl = document.getElementById('review-list');
+  rl.innerHTML = '';
+  if (wrongs.length === 0) {
+    rl.innerHTML = '<p style="color:var(--green);font-weight:600;padding:12px;">🎉 Barcha javoblar to\'g\'ri!</p>';
+  } else {
+    wrongs.forEach((w, i) => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="ri-q">${i+1}. ${w.q}</div>
+        <div class="ri-ans ${w.skipped ? 'wrong' : 'wrong'}">${w.skipped ? '⏱ Vaqt tugadi' : '❌ Siz: ' + w.chosen}</div>
+        <div class="ri-correct">✅ To'g'ri javob: ${w.correct}</div>`;
+      rl.appendChild(div);
+    });
+  }
+}
+</script>
+</body>
+</html>
